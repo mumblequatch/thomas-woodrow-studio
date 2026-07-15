@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thomas Woodrow — An Audio Drama Studio, Built with Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17140e;
+    --surface:#201c14;
+    --surface-2:#2a2418;
+    --line:rgba(233,166,60,.16);
+    --line-soft:rgba(236,230,214,.08);
+    --text:#ece6d6;
+    --dim:#a79e88;
+    --faint:#6e6752;
+    --amber:#e9a63c;
+    --amber-soft:rgba(233,166,60,.13);
+    --green:#8bb56b;
+    --u:8px;
+    --measure:units;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Space Grotesk",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  /* warm vignette + faint grain, like a dim studio */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(120% 80% at 70% -10%, rgba(233,166,60,.06), transparent 55%),
+      radial-gradient(90% 60% at 10% 110%, rgba(233,166,60,.04), transparent 60%);
+  }
+  .wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 clamp(24px,6vw,72px)}
+  .col{max-width:680px}
+
+  a{color:var(--amber);text-decoration:none}
+
+  /* ---------- eyebrow / top bar ---------- */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+    padding:calc(var(--u)*5) 0 calc(var(--u)*4);
+    border-bottom:1px solid var(--line-soft);
+    flex-wrap:wrap;
+  }
+  .kicker{
+    font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:500;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+  }
+  .kicker .amp{color:var(--amber)}
+  .topbar .date{font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+
+  /* ---------- hero ---------- */
+  .hero{padding:calc(var(--u)*10) 0 calc(var(--u)*7)}
+  h1{
+    font-family:"Fraunces",serif;font-optical-sizing:auto;
+    font-weight:400;font-size:clamp(2.6rem,6.2vw,4.6rem);
+    line-height:1.02;letter-spacing:-.015em;color:var(--text);
+    max-width:14ch;
+  }
+  h1 .light{color:var(--dim);font-weight:340;font-style:italic}
+
+  /* ---------- signal chain signature ---------- */
+  .chain{margin:calc(var(--u)*7) 0 calc(var(--u)*6);max-width:920px}
+  .chain svg{width:100%;height:auto;display:block;overflow:visible}
+  .chain-cap{
+    font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint);margin-top:calc(var(--u)*2.5);
+  }
+  .track{fill:none;stroke:var(--amber);stroke-width:1.5;opacity:.5;
+    stroke-dasharray:820;stroke-dashoffset:820;animation:draw 1900ms cubic-bezier(.6,.02,.2,1) 300ms forwards}
+  .node{opacity:0;transform-box:fill-box;transform-origin:center;animation:pop 520ms cubic-bezier(.34,1.4,.5,1) forwards}
+  .node .glow{filter:drop-shadow(0 0 5px rgba(233,166,60,.75))}
+  .nlabel{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.1em;fill:var(--dim);text-transform:uppercase;opacity:0;animation:fadein 500ms ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+  @keyframes fadein{to{opacity:1}}
+
+  /* ---------- lead prose ---------- */
+  .lead p{font-size:1.16rem;line-height:1.66;color:var(--text);margin-bottom:calc(var(--u)*3)}
+  .lead p:last-child{color:var(--dim)}
+  .lead .drop::first-letter{
+    font-family:"Fraunces",serif;font-weight:500;font-size:3.4em;line-height:.8;
+    float:left;padding:.06em .12em .02em 0;color:var(--amber);
+  }
+
+  /* ---------- working method panel ---------- */
+  .method{
+    margin:calc(var(--u)*9) 0;
+    background:linear-gradient(180deg,var(--surface),rgba(32,28,20,.55));
+    border:1px solid var(--line);border-radius:3px;
+    padding:clamp(28px,5vw,56px);
+    position:relative;
+  }
+  .method::before{
+    content:"";position:absolute;left:0;top:24px;bottom:24px;width:2px;background:var(--amber);border-radius:2px;
+  }
+  .panel-label{
+    font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:calc(var(--u)*4);
+  }
+  .pull{
+    font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.7rem,3.6vw,2.5rem);
+    line-height:1.14;letter-spacing:-.01em;color:var(--text);margin-bottom:calc(var(--u)*4);max-width:20ch;
+  }
+  .pull em{font-style:italic;color:var(--amber)}
+  .method p{color:var(--dim);margin-bottom:calc(var(--u)*3);max-width:64ch}
+  .method p strong{color:var(--text);font-weight:600}
+  .method code{
+    font-family:"JetBrains Mono",monospace;font-size:.82em;color:var(--amber);
+    background:var(--amber-soft);padding:.12em .4em;border-radius:3px;
+  }
+
+  /* ---------- act headers ---------- */
+  .act{margin:calc(var(--u)*14) 0 calc(var(--u)*8);display:flex;align-items:baseline;gap:calc(var(--u)*3);border-bottom:1px solid var(--line);padding-bottom:calc(var(--u)*3)}
+  .act .num{font-family:"JetBrains Mono",monospace;font-size:.8rem;font-weight:600;letter-spacing:.2em;color:var(--amber)}
+  .act h2{font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1;letter-spacing:-.01em;color:var(--text)}
+  .act .sub{font-family:"Space Grotesk";font-size:.95rem;color:var(--faint);margin-left:auto;text-align:right;max-width:30ch;line-height:1.4;align-self:flex-end}
+
+  /* ---------- project block ---------- */
+  .proj{padding:calc(var(--u)*6) 0;border-bottom:1px solid var(--line-soft)}
+  .proj:last-child{border-bottom:none}
+  .proj-head{display:flex;align-items:baseline;gap:calc(var(--u)*2.5);flex-wrap:wrap;margin-bottom:calc(var(--u)*3)}
+  .proj h3{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(1.4rem,3vw,1.95rem);line-height:1.08;letter-spacing:-.01em;color:var(--text)}
+  .proj h3 .role{display:block;font-family:"Space Grotesk";font-weight:400;font-size:.62em;letter-spacing:.01em;color:var(--dim);margin-top:4px}
+  .status{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:"JetBrains Mono",monospace;font-size:.66rem;font-weight:500;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--dim);
+    white-space:nowrap;padding-top:6px;
+  }
+  .led{width:7px;height:7px;border-radius:50%;flex:none}
+  .led.live{background:var(--green);box-shadow:0 0 7px rgba(139,181,107,.9);animation:blink 2.6s ease-in-out infinite}
+  .led.prod{background:var(--amber);box-shadow:0 0 7px rgba(233,166,60,.85)}
+  .led.dev{background:transparent;border:1.5px solid var(--amber)}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  .proj p{color:var(--dim);max-width:66ch;margin-bottom:calc(var(--u)*2)}
+  .proj p.body-strong{color:var(--text)}
+  .proj p em{color:var(--text);font-style:italic}
+
+  /* spec / receipts line */
+  .spec{
+    margin-top:calc(var(--u)*3);padding:calc(var(--u)*2.5) calc(var(--u)*3);
+    background:var(--surface);border-left:2px solid var(--line);
+    font-family:"JetBrains Mono",monospace;font-size:.76rem;line-height:1.9;
+    color:var(--faint);border-radius:0 3px 3px 0;
+  }
+  .spec .row{display:block}
+  .spec b{color:var(--dim);font-weight:500}
+  .spec .fig{color:var(--amber);font-weight:600}
+
+  /* grouped/support list */
+  .support{margin-top:calc(var(--u)*2)}
+  .support .item{padding:calc(var(--u)*3) 0;border-top:1px solid var(--line-soft);display:grid;grid-template-columns:170px 1fr;gap:calc(var(--u)*3)}
+  .support .item:first-child{border-top:none}
+  .support .item .name{font-family:"Space Grotesk";font-weight:600;font-size:.95rem;color:var(--text);line-height:1.4}
+  .support .item .name .meta{display:block;font-family:"JetBrains Mono",monospace;font-weight:400;font-size:.68rem;letter-spacing:.08em;color:var(--faint);margin-top:5px;text-transform:uppercase}
+  .support .item .desc{color:var(--dim);font-size:.98rem}
+
+  /* ---------- coda ---------- */
+  .coda{margin:calc(var(--u)*14) 0 calc(var(--u)*10);padding-top:calc(var(--u)*7);border-top:1px solid var(--line)}
+  .coda p{font-family:"Fraunces",serif;font-style:italic;font-weight:400;font-size:clamp(1.2rem,2.6vw,1.6rem);line-height:1.5;color:var(--dim);max-width:40ch}
+  .coda p .hi{color:var(--text);font-style:normal;font-weight:500}
+  .foot{padding:calc(var(--u)*4) 0 calc(var(--u)*9);font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  :focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  @media(max-width:620px){
+    body{font-size:16px}
+    .support .item{grid-template-columns:1fr;gap:6px}
+    .act{flex-wrap:wrap}
+    .act .sub{margin-left:0;text-align:left;align-self:auto}
+    .lead .drop::first-letter{font-size:3em}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .track{stroke-dashoffset:0}
+    .node,.nlabel{opacity:1}
+    .reveal{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="kicker">Thomas Woodrow <span class="amp">—</span> Writer · Director · Audio Drama</div>
+    <div class="date">Portfolio · July 2026</div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <h1>An audio drama studio,<br><span class="light">built with Claude.</span></h1>
+
+    <div class="chain" aria-label="Production pipeline: write, record, align, voice, master, ship">
+      <svg viewBox="0 0 880 96" role="img">
+        <path class="track" d="M40 40 H840"/>
+        <!-- nodes -->
+        <g class="node" style="animation-delay:600ms"><circle class="glow" cx="40" cy="40" r="6" fill="#e9a63c"/></g>
+        <g class="node" style="animation-delay:880ms"><circle class="glow" cx="200" cy="40" r="6" fill="#e9a63c"/></g>
+        <g class="node" style="animation-delay:1160ms"><circle class="glow" cx="360" cy="40" r="6" fill="#e9a63c"/></g>
+        <g class="node" style="animation-delay:1440ms"><circle class="glow" cx="520" cy="40" r="6" fill="#e9a63c"/></g>
+        <g class="node" style="animation-delay:1720ms"><circle class="glow" cx="680" cy="40" r="6" fill="#e9a63c"/></g>
+        <g class="node" style="animation-delay:2000ms"><circle class="glow" cx="840" cy="40" r="6" fill="#e9a63c"/></g>
+        <!-- labels -->
+        <text class="nlabel" x="40"  y="74" text-anchor="start"  style="animation-delay:700ms">Write</text>
+        <text class="nlabel" x="200" y="74" text-anchor="middle" style="animation-delay:980ms">Record</text>
+        <text class="nlabel" x="360" y="74" text-anchor="middle" style="animation-delay:1260ms">Align</text>
+        <text class="nlabel" x="520" y="74" text-anchor="middle" style="animation-delay:1540ms">Voice</text>
+        <text class="nlabel" x="680" y="74" text-anchor="middle" style="animation-delay:1820ms">Master</text>
+        <text class="nlabel" x="840" y="74" text-anchor="end"    style="animation-delay:2100ms">Ship</text>
+      </svg>
+      <div class="chain-cap">One continuous signal path — no manual seams</div>
+    </div>
+  </header>
+
+  <!-- LEAD -->
+  <section class="lead col">
+    <p class="drop">I set out to make audio drama and immediately hit friction. The tools didn't fit the way I wanted to work, and the gap between the writing, the recording, the voice production, and the release was full of manual seams. So I started closing the gaps. Working with Claude, that turned into something larger than I planned: a suite of tools that lets one person write, record, produce, and ship serialized audio drama without ever leaving the way I actually think.</p>
+    <p>What follows is both halves of that — the studio I built to remove the friction, and the work it exists to make. The collaboration with Claude runs through all of it, and it's been productive enough, across enough different kinds of problem, that I thought it was worth showing you.</p>
+  </section>
+
+  <!-- WORKING METHOD -->
+  <section class="method reveal">
+    <div class="panel-label">Working Method</div>
+    <p class="pull">The thing that changed wasn't that I got faster. It's that friction became <em>fixable</em>.</p>
+    <p>Every creator accumulates a list of inefficiencies they've learned to live with — the export that takes six manual steps, the format that won't talk to the next tool, the thing you do by hand every time because automating it was never worth the week it would cost. You route around them. They become invisible, and they quietly set the ceiling on what one person can make.</p>
+    <p>Collaborating with Claude collapsed the cost of fixing them. When I noticed a seam, I could close it that afternoon, not someday. And the effect compounded in a way I didn't anticipate: fix enough friction points in a row and you're no longer patching a workflow, you've built a new one. The production pipeline here didn't come from a design document. It came from solving the next inefficiency, then the next, until the write&nbsp;→&nbsp;record&nbsp;→&nbsp;produce&nbsp;→&nbsp;ship path had no manual seams left in it. The innovation was emergent — the byproduct of never again having to say <em>"that's just how it is."</em></p>
+    <p>The division of labor settled into something consistent. On the tooling, Claude worked as a pair-programmer I directed: I set the architecture and the constraints, it wrote to them and flagged where things drifted. Lathe carries that relationship in its own history — a <code>Co-Authored-By: Claude</code> trailer on 55 of 62 commits, and a <code>CLAUDE.md</code> defining what it could and couldn't decide. On the creative work I kept Claude on a shorter leash and wrote the leash down: the <strong>Underworld</strong> story bible opens with a dated <em>"Rules for Claude"</em> casting it as archivist, not author — preserve my text as canon, no autonomous synthesis. Different jobs, same principle. <strong>I decide what's true; Claude helps me build toward it fast enough that the building never blocks the making.</strong></p>
+  </section>
+
+  <!-- ACT I -->
+  <div class="act reveal">
+    <span class="num">ACT I</span>
+    <h2>The Studio</h2>
+    <span class="sub">The tools built to remove the friction. Local-first, private, running on my own machine — in daily use.</span>
+  </div>
+
+  <!-- Lathe -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>Lathe<span class="role">A native writing app for structurally complex work</span></h3>
+      <span class="status"><span class="led live"></span>Beta · In daily use</span>
+    </div>
+    <p class="body-strong">A macOS desktop app for long-form writing where structure matters — screenplays, serialized scripts, novels. Two-pane outline beside a real editor, with Fountain syntax classification, live decorations, typewriter scrolling, and atomic file I/O.</p>
+    <p>It reads and writes Fountain, txt, md, rtf, and docx, and it hooks directly into the production pipeline: "Apply Conformed Changes" folds machine-generated edits back into the open script. It exists because nothing off the shelf let me hold an outline and a draft in the same view the way I think about them.</p>
+    <div class="spec">
+      <span class="row"><b>Stack</b> &nbsp;Tauri 2.10 · Rust · Svelte 5 · TypeScript · CodeMirror 6</span>
+      <span class="row"><b>Scale</b> &nbsp;<span class="fig">~12,700</span> LOC · <span class="fig">62</span> commits over three months · <span class="fig">55</span> co-authored with Claude</span>
+    </div>
+  </article>
+
+  <!-- Pipeline -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>The production pipeline<span class="role">Write to master, no manual seams</span></h3>
+      <span class="status"><span class="led prod"></span>Functional · In production use</span>
+    </div>
+    <p class="body-strong">The piece I'm proudest of, because no one designed it top-down — it accreted from solving one inefficiency at a time until the whole path was automated. The master Fountain script is the single source of truth; everything downstream is regenerable from it.</p>
+    <p>The pipeline parses the script, force-aligns it against a recorded take, splits the audio into per-character REAPER tracks, runs AI voice conversion and cleanup, masters through Auphonic, and lays up the mix. What used to be a day of manual editing between "recorded" and "produced" is now a chain of hotkeys.</p>
+    <p>The engineering runs deeper than the surface suggests. The character-split engine is a real package with a maintained test suite, not a script. Auphonic mastering runs as a live background daemon. The ElevenLabs integration is a full voice-library manager, not a one-off API call. Underneath sit local ML stages — Whisper for transcription, Montreal Forced Aligner for alignment, pyannote for diarization — and hardware control down to the RME interface over OSC.</p>
+    <div class="spec">
+      <span class="row"><b>Stack</b> &nbsp;Python · Shell · REAPER Lua · ElevenLabs · Auphonic · Whisper / MFA / pyannote</span>
+      <span class="row"><b>Signal</b> &nbsp;a <span class="fig">~1,900</span>-LOC pytest suite on the character-split core — the strongest maturity marker in the studio</span>
+    </div>
+  </article>
+
+  <!-- Publishing -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>The publishing stack<span class="role">Desktop to distributed, by hotkey</span></h3>
+      <span class="status"><span class="led prod"></span>In active use</span>
+    </div>
+    <p>The last seam was getting finished work out the door. This stack ships written, audio, and video content to the web from the desktop: Cloudflare R2/CDN with edge purging, GitHub Pages, a Ghost newsletter with an embedded audio player generated straight from markdown + audio, and a podcast host — each wired to a keystroke, each self-logging every URL it publishes.</p>
+    <div class="spec">
+      <span class="row"><b>Stack</b> &nbsp;Python · Shell · Cloudflare R2 · GitHub Pages · Transistor</span>
+      <span class="row"><b>Use</b> &nbsp;<span class="fig">102</span> posts logged to date</span>
+    </div>
+  </article>
+
+  <!-- Supporting systems -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>Supporting systems<span class="role">The connective tissue that makes a studio of one actually run</span></h3>
+    </div>
+    <div class="support">
+      <div class="item">
+        <div class="name">REAPER automation library<span class="meta">~200 Lua scripts · ~22,000 LOC</span></div>
+        <div class="desc">Parallel processing chains with real engineering rationale, EQ-matching, ambisonics buses, hardware-following that mirrors mixer state into the DAW, and a long tail of key-bound actions.</div>
+      </div>
+      <div class="item">
+        <div class="name">Infrastructure automation<span class="meta">12 background services</span></div>
+        <div class="desc">Nightly backup of ~3.6 TB to Backblaze B2, drive remounting, inbox triage, and drift verification — each built on a consistent managed-job pattern.</div>
+      </div>
+      <div class="item">
+        <div class="name">A control surface<span class="meta">~130 macros · ~50 shortcuts</span></div>
+        <div class="desc">Keyboard Maestro macros and iOS/macOS Shortcuts sitting over the script library, so the whole studio is driven by muscle memory rather than menus.</div>
+      </div>
+      <div class="item">
+        <div class="name">Standalone tools<span class="meta">CLIs & bridges</span></div>
+        <div class="desc">A contact-enrichment CLI that reconciled a large warm-network list (mature enough to carry 14 test files), a Final Cut → REAPER timeline converter, an HTTP-to-OSC bridge for remote booth control, and a personal long-COVID health dashboard pulling daily Whoop data.</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ACT II -->
+  <div class="act reveal">
+    <span class="num">ACT II</span>
+    <h2>The Work</h2>
+    <span class="sub">What the studio exists to make. Original serialized audio drama and short-form work.</span>
+  </div>
+
+  <!-- Underworld -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>Underworld <span class="role">Original serialized audio drama · the flagship</span></h3>
+      <span class="status"><span class="led dev"></span>In development · partially produced</span>
+    </div>
+    <p class="body-strong">A planned three seasons of roughly twenty-minute episodes: a seven-year-old sorcerer follows his abducted parents into the Underworld, a land of the dead running on a memory-erasing drug economy. I pitch it as <em>His Dark Materials</em> meets the first time you saw <em>Star Wars</em>.</p>
+    <p>It's not just a script — it's a realized world. An Obsidian story bible of ~78,000 active words holds character bios, world lore, a thematic spine, and craft notes on the sound signatures and the magic system. Episode one is written and its season architecture is locked. There's a produced trailer with per-character voices, a composer pitch deck built for Mark Korven, and a full business plan for the venture. This is also where the Claude collaboration is most deliberately governed.</p>
+    <div class="spec">
+      <span class="row"><b>Built</b> &nbsp;<span class="fig">~78,000</span>-word story bible · trailer produced · Korven pitch deck · business plan</span>
+      <span class="row"><b>Method</b> &nbsp;governed by a dated "Rules for Claude" archivist contract</span>
+    </div>
+  </article>
+
+  <!-- The Other City -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>The Other City<span class="role">Original comedy audio drama</span></h3>
+      <span class="status"><span class="led prod"></span>In production · one episode</span>
+    </div>
+    <p>A surreal comedy radio play. Episode one, "My Old Man," is in active production: a ~4,400-word beat sheet, the script through half a dozen drafts, five original in-story songs composed, and per-character voices recorded and modeled.</p>
+    <div class="spec">
+      <span class="row"><b>Built</b> &nbsp;<span class="fig">~4,400</span>-word beat sheet · <span class="fig">5</span> original songs · voices modeled</span>
+    </div>
+  </article>
+
+  <!-- Short form -->
+  <article class="proj reveal">
+    <div class="proj-head">
+      <h3>Short-form &amp; produced work<span class="role">The finished, released material</span></h3>
+    </div>
+    <div class="support">
+      <div class="item">
+        <div class="name">The Evening News<span class="meta">4 episodes · produced</span></div>
+        <div class="desc">A recurring absurdist fake-local-news broadcast, finished and rendered — doubling as newsletter content.</div>
+      </div>
+      <div class="item">
+        <div class="name">Produced collections<span class="meta">songs · kids' pieces · readings</span></div>
+        <div class="desc">Novelty songs generated from my own lyrics and mastered in REAPER; original children's pieces, some co-credited with my son; short readings and Greek-myth adaptations.</div>
+      </div>
+      <div class="item">
+        <div class="name">Literary recitations<span class="meta">performance, not authorship</span></div>
+        <div class="desc">A large body of voice performances of published and public-domain writing — Frost, Stevens, Eliot, Poe, and others. Kept distinct on purpose: the VO craft, not the writing.</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- CODA -->
+  <div class="coda reveal">
+    <p>The studio and the stories are the same impulse expressed twice. I wanted to make a particular kind of thing, and found the friction in my way. <span class="hi">Because of Claude, I got to fix it instead of living with it.</span></p>
+  </div>
+
+  <div class="foot">
+    <span>Thomas Woodrow · Cantoworks</span>
+    <span>Built with Claude · 2026</span>
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    var els = document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+      });
+    },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(e){io.observe(e);});
+  })();
+</script>
+</body>
+</html>
